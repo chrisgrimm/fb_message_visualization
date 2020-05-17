@@ -53,10 +53,19 @@ def load_threads(base_dir, your_name, use_random_names=False):
         random_names = []
     for i, convo in enumerate(all_convos):
         print(f'({i} / {len(all_convos)}) Loading {convo}')
-        thread_path = os.path.join(inbox_path, convo, 'message_1.html')
-        with open(thread_path, 'r') as f:
-            thread_html = f.read()
-        messages = get_messages_from_thread_html(thread_html)[::-1]
+        convo_parts = [d for d in os.listdir(os.path.join(inbox_path, convo)) if d.startswith('message')]
+        def get_part_num(d):
+            part = re.match(r'^message\_(\d+).html$', d)
+            return int(part.groups()[0])
+        convo_parts = sorted(convo_parts, key=get_part_num)
+        messages = []
+        for convo_part in convo_parts:
+            thread_path = os.path.join(inbox_path, convo, convo_part)
+            print('loading', thread_path)
+            with open(thread_path, 'r') as f:
+                thread_html = f.read()
+            messages.extend(get_messages_from_thread_html(thread_html))
+        messages = messages[::-1]
         participants = get_thread_participants(messages)
         # only consider threads between you and one other person
         if (len(participants) != 2) or (your_name not in participants):
