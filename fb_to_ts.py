@@ -200,5 +200,5 @@ if __name__ == '__main__':
     scores = compute_thread_scores(base_dir, increment, your_name, use_random_names=args.use_random_names)
     with open('scores.pickle', 'wb') as f:
         pickle.dump(scores, f)
-    scores_file = '/Users/chris/projects/fb_messages/scores.pickle'
+    scores_file = './scores.pickle'
     build_csv(scores_file)
