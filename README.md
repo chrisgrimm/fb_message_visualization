@@ -31,7 +31,7 @@ Once you have it, it should be a zipped file with a name in the following format
 
 ### Processing the data
 
-The operations of the script can be thought of in three phases:
+The operations of the script can be thought as doing the following:
 1. Compute the temporal range in which all conversations have occurred. 
 2. Divide this range into bins of uniform size (i.e., one bin for each day).
 3. For each conversation thread with an individual, count the number of exchanged messages occurring in each bin.
