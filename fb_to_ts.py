@@ -40,11 +40,17 @@ def parse_message_soup(message_soup):
     return Message(time, message, author)
 
 
-def load_threads(base_dir, your_name):
+def load_threads(base_dir, your_name, use_random_names=False):
     inbox_path = os.path.join(base_dir, 'messages', 'inbox')
     threads = []
     all_convos = os.listdir(inbox_path)
     all_convos = [c for c in all_convos if not c.startswith('.')]
+    random_name_counter = 0
+    if use_random_names:
+        with open('./random_names.txt', 'r') as f:
+            random_names = f.readlines()
+    else:
+        random_names = []
     for i, convo in enumerate(all_convos):
         print(f'({i} / {len(all_convos)}) Loading {convo}')
         thread_path = os.path.join(inbox_path, convo, 'message_1.html')
@@ -57,8 +63,9 @@ def load_threads(base_dir, your_name):
             continue
         participants.remove(your_name)
         other_participant = participants.pop()
-        print(other_participant)
-
+        if use_random_names:
+            other_participant = random_names[random_name_counter]
+            random_name_counter += 1
         threads.append(Thread(other_participant, messages))
     return threads
 
@@ -120,8 +127,8 @@ def get_convo_bounds(threads):
     return start_time, end_time
 
 
-def compute_thread_scores(base_dir, increment, your_name):
-    threads = load_threads(base_dir, your_name)
+def compute_thread_scores(base_dir, increment, your_name, use_random_names=False):
+    threads = load_threads(base_dir, your_name, use_random_names)
     start_time, end_time = get_convo_bounds(threads)
     all_num_messages = []
     for thread in threads:
@@ -144,7 +151,7 @@ def build_csv(scores_file):
     for cutoff_time in cutoff_times:
         print(cutoff_time)
         str_times.append(cutoff_time.strftime('%b %d, %Y'))
-    headers = ['Country Name', 'region', 'Image URL'] + str_times
+    headers = ['Name', 'Image URL'] + str_times
     def get_initials_link(name):
         initials = [x[0].upper() for x in name.split(' ')]
         initials = [initials[0], initials[-1]]
@@ -158,7 +165,7 @@ def build_csv(scores_file):
                 continue
             print('Friend', friend)
             avgs = dict(zip(str_times, list(n_step_moving_average(num_messages, 120))))
-            row = {'Country Name': friend, 'region': 'Americas', 'Image URL': get_initials_link(friend)}
+            row = {'Name': friend, 'Image URL': get_initials_link(friend)}
             row = {**row, **avgs}
             writer.writerow(row)
 
@@ -168,6 +175,7 @@ if __name__ == '__main__':
     parser.add_argument('--base-dir', type=str, required=True)
     parser.add_argument('--name', type=str, required=True)
     parser.add_argument('--increment', type=str, default='1d')
+    parser.add_argument('--use-random-names', action='store_true')
     args = parser.parse_args()
     base_dir = args.base_dir
     your_name = args.name
@@ -180,7 +188,7 @@ if __name__ == '__main__':
     amount, unit = match.group()
     unit = {'h': 'hours', 'd': 'days', 'm': 'months'}[unit]
     increment = timedelta(**{unit: int(amount)})
-    scores = compute_thread_scores(base_dir, increment, your_name)
+    scores = compute_thread_scores(base_dir, increment, your_name, use_random_names=args.use_random_names)
     with open('scores.pickle', 'wb') as f:
         pickle.dump(scores, f)
     scores_file = '/Users/chris/projects/fb_messages/scores.pickle'
