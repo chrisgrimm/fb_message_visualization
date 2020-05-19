@@ -23,7 +23,7 @@ To recover this information from Facebook, follow the below steps:
 1. Navigate to 
 ```https://www.facebook.com/dyi/?referrer=yfi_settings```
 2. Click **Deselect All** on the **Your Information** pane, then check the box to the right of **Messages**.
-3. Click **Create File** under the **Request Copy** pane.
+3. Click **Create File** under the **Request Copy** pane. (Be sure that the format of the request is HTML)
 4. It will take Facebook a while to generate this file.
 Once you have it, it should be a zipped file with a name in the following format:
 ```facebook_<username>.zip```
