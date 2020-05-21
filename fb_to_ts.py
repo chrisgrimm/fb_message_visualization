@@ -8,6 +8,7 @@ import pickle
 import csv
 import argparse
 import re
+import tqdm
 
 
 Message = namedtuple('Message', ['time',  'message', 'author'])
@@ -51,8 +52,10 @@ def load_threads(base_dir, your_name, use_random_names=False):
             random_names = f.readlines()
     else:
         random_names = []
+    print('Loading conversations...')
+    pbar = tqdm.tqdm(total=len(all_convos))
     for i, convo in enumerate(all_convos):
-        print(f'({i} / {len(all_convos)}) Loading {convo}')
+        pbar.update(1)
         convo_parts = [d for d in os.listdir(os.path.join(inbox_path, convo)) if d.startswith('message')]
         def get_part_num(d):
             part = re.match(r'^message\_(\d+).html$', d)
@@ -61,7 +64,6 @@ def load_threads(base_dir, your_name, use_random_names=False):
         messages = []
         for convo_part in convo_parts:
             thread_path = os.path.join(inbox_path, convo, convo_part)
-            print('loading', thread_path)
             with open(thread_path, 'r') as f:
                 thread_html = f.read()
             messages.extend(get_messages_from_thread_html(thread_html))
@@ -76,6 +78,7 @@ def load_threads(base_dir, your_name, use_random_names=False):
             other_participant = random_names[random_name_counter]
             random_name_counter += 1
         threads.append(Thread(other_participant, messages))
+    pbar.close()
     return threads
 
 
@@ -158,7 +161,6 @@ def build_csv(scores_file):
         cutoff_time = time + increment
     str_times = []
     for cutoff_time in cutoff_times:
-        print(cutoff_time)
         str_times.append(cutoff_time.strftime('%b %d, %Y'))
     headers = ['Name', 'Image URL'] + str_times
     def get_initials_link(name):
@@ -169,14 +171,19 @@ def build_csv(scores_file):
     with open('scores.csv', 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=headers)
         writer.writeheader()
+        print('Processing messages into CSV...')
+        pbar = tqdm.tqdm(total=len(scores))
         for friend, num_messages in scores:
+            pbar.update(1)
+            if friend == '':
+                continue
             if friend == 'Facebook User':
                 continue
-            print('Friend', friend)
             avgs = dict(zip(str_times, list(n_step_moving_average(num_messages, 120))))
             row = {'Name': friend, 'Image URL': get_initials_link(friend)}
             row = {**row, **avgs}
             writer.writerow(row)
+        pbar.close()
 
 
 if __name__ == '__main__':
