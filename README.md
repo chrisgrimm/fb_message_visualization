@@ -42,7 +42,7 @@ To run the script execute:
 ```bash
 python fb_to_ts.py --name="<your_name_on_facebook>" --base-dir="./<name_of_messages_directory>"
 ```
-which will produce a CSV file titled ```scores.csv```. 
+where ```your_name_on_facebook``` is whatever your name is listed as on your Facebook Profile (e.g., "Chris Grimm"). This will produce a CSV file titled ```scores.csv```. 
 
 ### Loading the data onto Flourish
 1. Go to the url ```https://public.flourish.studio/visualisation/2439541/```
