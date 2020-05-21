@@ -23,7 +23,7 @@ To recover this information from Facebook, follow the below steps:
 1. Navigate to 
 ```https://www.facebook.com/dyi/?referrer=yfi_settings```
 2. Click **Deselect All** on the **Your Information** pane, then check the box to the right of **Messages**.
-3. Click **Create File** under the **Request Copy** pane.
+3. Click **Create File** under the **Request Copy** pane. (Be sure that the format of the request is HTML)
 4. It will take Facebook a while to generate this file.
 Once you have it, it should be a zipped file with a name in the following format:
 ```facebook_<username>.zip```
@@ -31,7 +31,7 @@ Once you have it, it should be a zipped file with a name in the following format
 
 ### Processing the data
 
-The operations of the script can be thought of in three phases:
+The operations of the script can be thought as doing the following:
 1. Compute the temporal range in which all conversations have occurred. 
 2. Divide this range into bins of uniform size (i.e., one bin for each day).
 3. For each conversation thread with an individual, count the number of exchanged messages occurring in each bin.
@@ -42,7 +42,7 @@ To run the script execute:
 ```bash
 python fb_to_ts.py --name="<your_name_on_facebook>" --base-dir="./<name_of_messages_directory>"
 ```
-which will produce a CSV file titled ```scores.csv```. 
+where ```your_name_on_facebook``` is whatever your name is listed as on your Facebook Profile (e.g., "Chris Grimm"). This will produce a CSV file titled ```scores.csv```. 
 
 ### Loading the data onto Flourish
 1. Go to the url ```https://public.flourish.studio/visualisation/2439541/```
